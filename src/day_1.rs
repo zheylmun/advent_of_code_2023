@@ -24,7 +24,7 @@ pub fn day_1() -> String {
             })
             .unwrap();
     }
-    format!("Day 1 result: {}", sum)
+    sum.to_string()
 }
 
 pub fn day_1_pt_2() -> String {
@@ -66,7 +66,7 @@ pub fn day_1_pt_2() -> String {
         sum += digits.first().unwrap().1 * 10 + digits.last().unwrap().1;
     }
 
-    format!("Day 1 pt 2 result: {}", sum)
+    sum.to_string()
 }
 static _SAMPLE_INPUT: &str = "two1nine
 eightwothree
