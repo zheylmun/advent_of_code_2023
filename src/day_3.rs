@@ -19,13 +19,10 @@ struct SchematicRow {
 impl SchematicRow {
     fn contains_neighbor_symbol(&self, start_index: usize, end_index: usize) -> bool {
         for item in &self.items {
-            match item {
-                SchematicItem::Symbol { index, .. } => {
-                    if (start_index == 0 || *index >= start_index - 1) && *index <= end_index + 1 {
-                        return true;
-                    }
+            if let SchematicItem::Symbol { index, .. } = item {
+                if (start_index == 0 || *index >= start_index - 1) && *index <= end_index + 1 {
+                    return true;
                 }
-                _ => {}
             }
         }
         false
@@ -34,17 +31,15 @@ impl SchematicRow {
     fn neighbor_numbers(&self, index: usize) -> Vec<u32> {
         let mut neighbors = Vec::new();
         for item in &self.items {
-            match item {
-                SchematicItem::Number {
-                    start_index,
-                    end_index,
-                    value,
-                } => {
-                    if (*start_index == 0 || index >= *start_index - 1) && index <= *end_index + 1 {
-                        neighbors.push(*value);
-                    }
+            if let SchematicItem::Number {
+                start_index,
+                end_index,
+                value,
+            } = item
+            {
+                if (*start_index == 0 || index >= *start_index - 1) && index <= *end_index + 1 {
+                    neighbors.push(*value);
                 }
-                _ => {}
             }
         }
         neighbors
@@ -140,35 +135,30 @@ pub fn day_3_pt_1() -> String {
     let mut sum = 0;
     let schematic = parse_schematic(INPUT);
     for (row_index, row) in schematic.iter().enumerate() {
-        for (item_index, item) in row.items.iter().enumerate() {
-            match item {
-                SchematicItem::Number {
-                    start_index,
-                    end_index,
-                    value,
-                } => {
-                    if *value == 0 {
-                        continue;
-                    }
-                    if row.contains_neighbor_symbol(*start_index, *end_index) {
-                        sum += value;
-                    }
-                    if row_index > 0 {
-                        if schematic[row_index - 1]
-                            .contains_neighbor_symbol(*start_index, *end_index)
-                        {
-                            sum += value;
-                        }
-                    }
-                    if row_index + 1 < schematic.len() {
-                        if schematic[row_index + 1]
-                            .contains_neighbor_symbol(*start_index, *end_index)
-                        {
-                            sum += value;
-                        }
-                    }
+        for item in &row.items {
+            if let SchematicItem::Number {
+                start_index,
+                end_index,
+                value,
+            } = item
+            {
+                if *value == 0 {
+                    continue;
                 }
-                _ => {}
+                if row.contains_neighbor_symbol(*start_index, *end_index) {
+                    sum += value;
+                }
+                if row_index > 0
+                    && schematic[row_index - 1].contains_neighbor_symbol(*start_index, *end_index)
+                {
+                    sum += value;
+                }
+
+                if row_index + 1 < schematic.len()
+                    && schematic[row_index + 1].contains_neighbor_symbol(*start_index, *end_index)
+                {
+                    sum += value;
+                }
             }
         }
     }
@@ -179,29 +169,22 @@ pub fn day_3_pt_2() -> String {
     let mut sum = 0;
     let schematic = parse_schematic(INPUT);
     for (row_index, row) in schematic.iter().enumerate() {
-        for (item_index, item) in row.items.iter().enumerate() {
-            match item {
-                SchematicItem::Symbol { index, symbol } => {
-                    if !is_gear(*symbol) {
-                        continue;
-                    }
-                    let mut neighbors = Vec::<u32>::new();
-                    neighbors.append(&mut row.neighbor_numbers(*index));
-                    if row_index > 0 {
-                        neighbors.append(&mut schematic[row_index - 1].neighbor_numbers(*index));
-                    }
-                    if row_index + 1 < schematic.len() {
-                        neighbors.append(&mut schematic[row_index + 1].neighbor_numbers(*index));
-                    }
-                    println!(
-                        "Gear ({},{}) neighbors: {:?}",
-                        row_index, item_index, neighbors
-                    );
-                    if neighbors.len() == 2 {
-                        sum += neighbors.iter().product::<u32>();
-                    }
+        for item in &row.items {
+            if let SchematicItem::Symbol { index, symbol } = item {
+                if !is_gear(*symbol) {
+                    continue;
                 }
-                _ => {}
+                let mut neighbors = Vec::<u32>::new();
+                neighbors.append(&mut row.neighbor_numbers(*index));
+                if row_index > 0 {
+                    neighbors.append(&mut schematic[row_index - 1].neighbor_numbers(*index));
+                }
+                if row_index + 1 < schematic.len() {
+                    neighbors.append(&mut schematic[row_index + 1].neighbor_numbers(*index));
+                }
+                if neighbors.len() == 2 {
+                    sum += neighbors.iter().product::<u32>();
+                }
             }
         }
     }
